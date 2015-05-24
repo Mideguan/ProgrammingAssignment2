@@ -1,7 +1,8 @@
 ## NOTES:
 ## This R program is able to cache potentially time-consuming computations by
 ## taking advantage of the scoping rules of the R language to preserve state 
-## inside of an R object.
+## inside of an R object. 
+## Limitations: This function assumes that the matrix supplied is always invertible.
 
 
 ## The 1st function, makeCacheMatrix creates a special "matrix", a list  
