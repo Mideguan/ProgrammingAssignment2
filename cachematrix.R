@@ -1,9 +1,10 @@
 ## NOTES:
 ## This R program is able to cache potentially time-consuming computations by
-## taking advantage of the scoping rules of the R language and how they can be 
-## manipulated to preserve state inside of an R object.
+## taking advantage of the scoping rules of the R language to preserve state 
+## inside of an R object.
 
-## The first function, makeCacheMatrix creates a special "matrix", a list  
+
+## The 1st function, makeCacheMatrix creates a special "matrix", a list  
 ## containing a function which
 ##      (i)  sets the value of the matrix
 ##      (ii) gets the value of the matrix
@@ -11,34 +12,50 @@
 ##      (iv) gets the value of the inverse
 
 makeCacheMatrix <- function(x = matrix()) {
-        m <- NULL
+        i <- NULL
         set <- function(y) {
+                
+                ## The '<<-' operator used to assign a value to an object in 
+                ## an environment that is different from the current environment
+                
                 x <<- y
-                m <<- NULL
+                i <<- NULL
         }
+        
         get <- function() x
-        setmean <- function(mean) m <<- mean
-        getmean <- function() m
+        
+        setinvm <- function(inv) i <<- inv
+        getinvm <- function() i
+        
         list(set = set, get = get,
-             setmean = setmean,
-             getmean = getmean)
+             setinvm = setinvm,
+             getinvm = getinvm)
 }
 
 
-## The second function, cacheSolve, This function computes the inverse 
-## of the special "matrix" returned by makeCacheMatrix above. If the inverse 
-## has already been calculated (and the matrix has not changed), then the 
-## cachesolve should retrieve the inverse from the cache
+## The 2nd function, cacheSolve, computes the inverse of the special "matrix"
+## returned by makeCacheMatrix above. If the inverse has already been calculated
+## (and the matrix has not changed), then the cachesolve should retrieve the
+## inverse from the cache
 
 cacheSolve <- function(x, ...) {
+        
         ## Return a matrix that is the inverse of 'x'
-        m <- x$getmean()
-        if(!is.null(m)) {
+        i <- x$getinvm()
+        
+        ## Check from cache if the inverse has been computed earlier
+        if(!is.null(i)) {
+                
+                ## If computed earlier, get from cache 
                 message("getting cached data")
-                return(m)
+                return(i)
         }
-        data <- x$get()
-        m <- mean(data, ...)
-        x$setmean(m)
-        m
+        
+        ## If NOT computed earlier, compute inverse 
+        matrixtrinity <- x$get()
+        i <- solve(matrixtrinity, ...)
+        
+        ## Sets the inverse value in the cache via the setinvm function         
+        x$setinvm(i)
+        i
 }
